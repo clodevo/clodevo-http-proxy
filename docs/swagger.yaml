@@ -1,0 +1,327 @@
+definitions:
+  models.APIKey:
+    properties:
+      api_key:
+        type: string
+      api_key_id:
+        type: string
+      created_at:
+        type: string
+      tenant_id:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  models.CreateTenantRequest:
+    properties:
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  models.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  models.Tenant:
+    properties:
+      Name:
+        type: string
+      id:
+        type: string
+    type: object
+info:
+  contact:
+    email: support@clodevo.com
+    name: API Support
+    url: https://www.clodevo.com/
+  description: This is a forward proxy server made by Clodevo.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: Clodevo Forward Proxy API
+  version: "1.0"
+paths:
+  /{tenantID}/api-keys:
+    get:
+      consumes:
+      - application/json
+      description: Get the API keys associated with the given tenantID, only API keys
+        id are shown.
+      parameters:
+      - description: Tenant ID
+        in: path
+        name: tenantID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.APIKey'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Tenant API keys IDs
+      tags:
+      - api-keys
+    post:
+      consumes:
+      - application/json
+      description: Create a new API key for a tenant
+      parameters:
+      - description: Tenant ID
+        in: path
+        name: tenantID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.APIKey'
+      security:
+      - ApiKeyAuth: []
+      summary: Create an API key
+      tags:
+      - api-keys
+  /{tenantID}/api-keys/{apiKeyID}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete the API key associated with the given ID and tenant
+      parameters:
+      - description: Tenant ID
+        in: path
+        name: tenantID
+        required: true
+        type: string
+      - description: API Key ID
+        in: path
+        name: apiKeyID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: API key deleted successfully
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete API key
+      tags:
+      - api-keys
+  /{tenantID}/api-keys/{apiKeyID}/rotate:
+    put:
+      consumes:
+      - application/json
+      description: Rotate the API key associated with the given ID and tenant, generating
+        a new key while keeping the same ID
+      parameters:
+      - description: Tenant ID
+        in: path
+        name: tenantID
+        required: true
+        type: string
+      - description: API Key ID
+        in: path
+        name: apiKeyID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.APIKey'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Rotate API key
+      tags:
+      - api-keys
+  /tenants:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all tenants
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Tenant'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get all tenants
+      tags:
+      - tenants
+    post:
+      consumes:
+      - application/json
+      description: Create a new tenant with the provided name
+      parameters:
+      - description: Tenant creation request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateTenantRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Tenant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create a new tenant
+      tags:
+      - tenants
+  /tenants/{tenantID}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a tenant by its ID
+      parameters:
+      - description: Tenant ID
+        in: path
+        name: tenantID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Tenant deleted successfully
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete a tenant by ID
+      tags:
+      - tenants
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a tenant by its ID
+      parameters:
+      - description: Tenant ID
+        in: path
+        name: tenantID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Tenant'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get a tenant by ID
+      tags:
+      - tenants
+    put:
+      consumes:
+      - application/json
+      description: Update a tenant's name by its ID
+      parameters:
+      - description: Tenant ID
+        in: path
+        name: tenantID
+        required: true
+        type: string
+      - description: Tenant object
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateTenantRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Tenant updated successfully
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update a tenant by ID
+      tags:
+      - tenants
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: X-Admin-API-Key
+    type: apiKey
+swagger: "2.0"

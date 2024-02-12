@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: clodevo-proxy
+  labels:
+    app: clodevo-proxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: clodevo-proxy
+  template:
+    metadata:
+      labels:
+        app: clodevo-proxy
+    spec:
+      containers:
+      - name: proxy
+        image: lakhlaifi/clodevo-http-proxy:1.0.0 
+        ports:
+        - containerPort: 8080
+        - containerPort: 9090
+        env:
+        - name: ADMINAPIKEY
+          value: "secretValue123"
+        volumeMounts:
+        - name: acl-config
+          mountPath: /opt/proxy/tenants
+      volumes:
+      - name: acl-config
+        configMap:
+          name: clodevo-proxy-acl

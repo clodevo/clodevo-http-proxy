@@ -1,0 +1,8 @@
+{
+    "proxy": {
+      "maxConcurrent": 512,
+      "timeout": "20s"
+    },
+    "admin-api-key": "your_admin_api_key"
+  }
+  
